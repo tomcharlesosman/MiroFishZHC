@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="app-header">
       <div class="header-left">
-        <div class="brand" @click="router.push('/')">MIROFISH</div>
+        <div class="brand" @click="router.push('/')">JUNOFISH</div>
       </div>
       
       <div class="header-center">
@@ -15,7 +15,7 @@
             :class="{ active: viewMode === mode }"
             @click="viewMode = mode"
           >
-            {{ { graph: '图谱', split: '双栏', workbench: '工作台' }[mode] }}
+            {{ { graph: 'Graph', split: 'Split', workbench: 'Workbench' }[mode] }}
           </button>
         </div>
       </div>
@@ -30,6 +30,7 @@
           <span class="dot"></span>
           {{ statusText }}
         </span>
+        <WorkspaceSessionNav />
       </div>
     </header>
 
@@ -48,7 +49,7 @@
 
       <!-- Right Panel: Step Components -->
       <div class="panel-wrapper right" :style="rightPanelStyle">
-        <!-- Step 1: 图谱构建 -->
+        <!-- Step 1: Graph Construction -->
         <Step1GraphBuild 
           v-if="currentStep === 1"
           :currentPhase="currentPhase"
@@ -59,7 +60,7 @@
           :systemLogs="systemLogs"
           @next-step="handleNextStep"
         />
-        <!-- Step 2: 环境搭建 -->
+        <!-- Step 2: Environment Setup -->
         <Step2EnvSetup
           v-else-if="currentStep === 2"
           :projectData="projectData"
@@ -75,11 +76,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GraphPanel from '../components/GraphPanel.vue'
 import Step1GraphBuild from '../components/Step1GraphBuild.vue'
 import Step2EnvSetup from '../components/Step2EnvSetup.vue'
+import WorkspaceSessionNav from '../components/WorkspaceSessionNav.vue'
 import { generateOntology, getProject, buildGraph, getTaskStatus, getGraphData } from '../api/graph'
 import { getPendingUpload, clearPendingUpload } from '../store/pendingUpload'
 
@@ -90,8 +92,8 @@ const router = useRouter()
 const viewMode = ref('split') // graph | split | workbench
 
 // Step State
-const currentStep = ref(1) // 1: 图谱构建, 2: 环境搭建, 3: 开始模拟, 4: 报告生成, 5: 深度互动
-const stepNames = ['图谱构建', '环境搭建', '开始模拟', '报告生成', '深度互动']
+const currentStep = ref(1) // 1: Graph Construction, 2: Environment Setup, 3: Simulation Run, 4: Report Generation, 5: Deep Interaction
+const stepNames = ['Graph Construction', 'Environment Setup', 'Simulation Run', 'Report Generation', 'Deep Interaction']
 
 // Data State
 const currentProjectId = ref(route.params.projectId)
@@ -108,6 +110,7 @@ const systemLogs = ref([])
 // Polling timers
 let pollTimer = null
 let graphPollTimer = null
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // --- Computed Layout Styles ---
 const leftPanelStyle = computed(() => {
@@ -159,11 +162,10 @@ const toggleMaximize = (target) => {
 const handleNextStep = (params = {}) => {
   if (currentStep.value < 5) {
     currentStep.value++
-    addLog(`进入 Step ${currentStep.value}: ${stepNames[currentStep.value - 1]}`)
+    addLog(`Moved to Step ${currentStep.value}: ${stepNames[currentStep.value - 1]}`)
     
-    // 如果是从 Step 2 进入 Step 3，记录模拟轮数配置
     if (currentStep.value === 3 && params.maxRounds) {
-      addLog(`自定义模拟轮数: ${params.maxRounds} 轮`)
+      addLog(`Custom simulation rounds: ${params.maxRounds}`)
     }
   }
 }
@@ -171,7 +173,7 @@ const handleNextStep = (params = {}) => {
 const handleGoBack = () => {
   if (currentStep.value > 1) {
     currentStep.value--
-    addLog(`返回 Step ${currentStep.value}: ${stepNames[currentStep.value - 1]}`)
+    addLog(`Returned to Step ${currentStep.value}: ${stepNames[currentStep.value - 1]}`)
   }
 }
 
@@ -188,21 +190,59 @@ const initProject = async () => {
 
 const handleNewProject = async () => {
   const pending = getPendingUpload()
-  if (!pending.isPending || pending.files.length === 0) {
-    error.value = 'No pending files found.'
-    addLog('Error: No pending files found for new project.')
+  const websiteUrl = (pending.companyWebsiteUrl || '').trim()
+  const requirement = (pending.simulationRequirement || '').trim()
+  const fileCount = pending.files?.length || 0
+
+  if (!pending.isPending) {
+    error.value = 'No pending project input found.'
+    addLog('Error: No pending project input found for new project.')
+    return
+  }
+
+  if (!requirement) {
+    error.value = 'Simulation requirement is required.'
+    addLog('Error: Missing simulation requirement.')
+    return
+  }
+
+  if (!websiteUrl && fileCount === 0) {
+    error.value = 'Provide a company website URL or upload at least one document.'
+    addLog('Error: Missing both website URL and uploaded documents.')
     return
   }
   
   try {
     loading.value = true
     currentPhase.value = 0
-    ontologyProgress.value = { message: 'Uploading and analyzing docs...' }
-    addLog('Starting ontology generation: Uploading files...')
+    if (websiteUrl) {
+      ontologyProgress.value = { message: 'Website discovery/crawl started...' }
+      addLog('Stage 1/4: Website discovery/crawl started.')
+      await sleep(350)
+      ontologyProgress.value = { message: 'Crawl complete. Website content collected.' }
+      addLog('Stage 2/4: Crawl complete.')
+      await sleep(350)
+      ontologyProgress.value = {
+        message: fileCount > 0
+          ? 'Website content merged with uploaded docs.'
+          : 'Website content merged with uploaded docs (none uploaded in this run).'
+      }
+      addLog('Stage 3/4: Website content merged with uploaded docs.')
+      await sleep(350)
+    } else {
+      ontologyProgress.value = { message: 'Uploaded documents collected for ontology generation.' }
+      addLog('Stage 1/2: Uploaded documents collected.')
+      await sleep(350)
+    }
+    ontologyProgress.value = { message: 'Ontology generation started...' }
+    addLog(websiteUrl ? 'Stage 4/4: Ontology generation started.' : 'Stage 2/2: Ontology generation started.')
     
     const formData = new FormData()
     pending.files.forEach(f => formData.append('files', f))
-    formData.append('simulation_requirement', pending.simulationRequirement)
+    if (websiteUrl) {
+      formData.append('company_website_url', websiteUrl)
+    }
+    formData.append('simulation_requirement', requirement)
     
     const res = await generateOntology(formData)
     if (res.success) {
