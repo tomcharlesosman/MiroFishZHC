@@ -1,6 +1,4 @@
-"""
-业务服务模块
-"""
+"""Business services module."""
 
 from .ontology_generator import OntologyGenerator
 from .graph_builder import GraphBuilderService
@@ -70,4 +68,3 @@ __all__ = [
     'CommandType',
     'CommandStatus',
 ]
-

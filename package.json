@@ -1,14 +1,16 @@
 {
   "name": "mirofish",
   "version": "0.1.0",
-  "description": "MiroFish - 简洁通用的群体智能引擎，预测万物",
+  "description": "MiroFish - A flexible collective-intelligence engine for forecasting complex scenarios",
   "scripts": {
-    "setup": "npm install && cd frontend && npm install",
+    "setup": "npm install && cd frontend && npm install && cd ../auth-service && npm install",
     "setup:backend": "cd backend && uv sync",
     "setup:all": "npm run setup && npm run setup:backend",
-    "dev": "concurrently --kill-others -n \"backend,frontend\" -c \"green,cyan\" \"npm run backend\" \"npm run frontend\"",
+    "auth:prepare": "npm --prefix auth-service run migrate",
+    "dev": "npm run auth:prepare && concurrently --kill-others -n \"backend,frontend,auth\" -c \"green,cyan,magenta\" \"npm run backend\" \"npm run frontend\" \"npm run auth\"",
     "backend": "cd backend && uv run python run.py",
     "frontend": "cd frontend && npm run dev",
+    "auth": "npm --prefix auth-service run dev",
     "build": "cd frontend && npm run build"
   },
   "devDependencies": {

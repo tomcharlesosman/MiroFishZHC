@@ -1,134 +1,188 @@
 <template>
   <div class="home-container">
-    <!-- 顶部导航栏 -->
-    <nav class="navbar">
-      <div class="nav-brand">MIROFISH</div>
-      <div class="nav-links">
-        <a href="https://github.com/666ghj/MiroFish" target="_blank" class="github-link">
-          访问我们的Github主页 <span class="arrow">↗</span>
-        </a>
-      </div>
-    </nav>
+    <section class="hero-stage">
+      <img :src="heroScene" alt="JunoFish strategy scene" class="hero-image" />
+      <div class="hero-film"></div>
+      <div class="hero-grain"></div>
 
-    <div class="main-content">
-      <!-- 上半部分：Hero 区域 -->
-      <section class="hero-section">
-        <div class="hero-left">
-          <div class="tag-row">
-            <span class="orange-tag">简洁通用的群体智能引擎</span>
-            <span class="version-text">/ v0.1-预览版</span>
-          </div>
-          
-          <h1 class="main-title">
-            上传任意报告<br>
-            <span class="gradient-text">即刻推演未来</span>
-          </h1>
-          
-          <div class="hero-desc">
-            <p>
-              即使只有一段文字，<span class="highlight-bold">MiroFish</span> 也能基于其中的现实种子，全自动生成与之对应的至多<span class="highlight-orange">百万级Agent</span>构成的平行世界。通过上帝视角注入变量，在复杂的群体交互中寻找动态环境下的<span class="highlight-code">“局部最优解”</span>
-            </p>
-            <p class="slogan-text">
-              让未来在 Agent 群中预演，让决策在百战后胜出<span class="blinking-cursor">_</span>
-            </p>
-          </div>
-           
-          <div class="decoration-square"></div>
+      <nav class="navbar">
+        <div class="nav-brand">
+          <span class="nav-mark">JUNOFISH</span>
+          <span class="nav-meta">Decision Preview</span>
         </div>
-        
-        <div class="hero-right">
-          <!-- Logo 区域 -->
-          <div class="logo-container">
-            <img src="../assets/logo/MiroFish_logo_left.jpeg" alt="MiroFish Logo" class="hero-logo" />
-          </div>
-          
-          <button class="scroll-down-btn" @click="scrollToBottom">
-            ↓
+
+        <div class="nav-actions">
+          <button class="nav-cta" @click="handleAccess">
+            {{ accessLabel }}
           </button>
         </div>
-      </section>
+      </nav>
 
-      <!-- 下半部分：双栏布局 -->
-      <section class="dashboard-section">
-        <!-- 左栏：状态与步骤 -->
-        <div class="left-panel">
-          <div class="panel-header">
-            <span class="status-dot">■</span> 系统状态
-          </div>
-          
-          <h2 class="section-title">准备就绪</h2>
-          <p class="section-desc">
-            预测引擎待命中，可上传多份非结构化数据以初始化模拟序列
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="hero-kicker">FOR HIGH-STAKES COMPANY DECISIONS / v0.1 preview</p>
+          <h1 class="hero-brand">JUNOFISH</h1>
+          <p class="hero-headline">Explore how a company move might land before you make it.</p>
+          <p class="hero-body">
+            Start with the company website, add the few documents that matter, and get a clearer
+            picture of how customers, partners, your team, and the market may respond.
           </p>
-          
-          <!-- 数据指标卡片 -->
-          <div class="metrics-row">
-            <div class="metric-card">
-              <div class="metric-value">低成本</div>
-              <div class="metric-label">常规模拟平均5$/次</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value">高可用</div>
-              <div class="metric-label">最多百万级Agent模拟</div>
-            </div>
+
+          <div class="hero-actions">
+            <button class="hero-primary-btn" @click="scrollToSetup">Open Intake</button>
+            <button class="hero-secondary-btn" @click="handleAccess">
+              {{ session.data?.user ? 'Open Archive' : 'Sign In' }}
+            </button>
           </div>
 
-          <!-- 项目模拟步骤介绍 (新增区域) -->
-          <div class="steps-container">
-            <div class="steps-header">
-               <span class="diamond-icon">◇</span> 工作流序列
+          <p class="hero-footnote">
+            Take a look around first. Sign in when you want to save your work, start a project, or
+            reopen an older one.
+          </p>
+        </div>
+
+        <div class="hero-ledger" aria-label="JunoFish input sequence">
+          <div class="ledger-line">
+            <span class="ledger-index">01</span>
+            <div>
+              <strong>Start with the website</strong>
+              <p>Use the homepage so JunoFish can understand what the company does and how it presents itself.</p>
             </div>
-            <div class="workflow-list">
-              <div class="workflow-item">
-                <span class="step-num">01</span>
-                <div class="step-info">
-                  <div class="step-title">图谱构建</div>
-                  <div class="step-desc">现实种子提取 & 个体与群体记忆注入 & GraphRAG构建</div>
-                </div>
-              </div>
-              <div class="workflow-item">
-                <span class="step-num">02</span>
-                <div class="step-info">
-                  <div class="step-title">环境搭建</div>
-                  <div class="step-desc">实体关系抽取 & 人设生成 & 环境配置Agent注入仿真参数</div>
-                </div>
-              </div>
-              <div class="workflow-item">
-                <span class="step-num">03</span>
-                <div class="step-info">
-                  <div class="step-title">开始模拟</div>
-                  <div class="step-desc">双平台并行模拟 & 自动解析预测需求 & 动态更新时序记忆</div>
-                </div>
-              </div>
-              <div class="workflow-item">
-                <span class="step-num">04</span>
-                <div class="step-info">
-                  <div class="step-title">报告生成</div>
-                  <div class="step-desc">ReportAgent拥有丰富的工具集与模拟后环境进行深度交互</div>
-                </div>
-              </div>
-              <div class="workflow-item">
-                <span class="step-num">05</span>
-                <div class="step-info">
-                  <div class="step-title">深度互动</div>
-                  <div class="step-desc">与模拟世界中的任意一位进行对话 & 与ReportAgent进行对话</div>
-                </div>
-              </div>
+          </div>
+          <div class="ledger-line">
+            <span class="ledger-index">02</span>
+            <div>
+              <strong>Add the inside story</strong>
+              <p>Upload decks, briefs, and notes that fill in what the public site does not say.</p>
+            </div>
+          </div>
+          <div class="ledger-line">
+            <span class="ledger-index">03</span>
+            <div>
+              <strong>Ask the real question</strong>
+              <p>Ask the question and see how the people around it may react before anything goes live.</p>
             </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <!-- 右栏：交互控制台 -->
-        <div class="right-panel">
-          <div class="console-box">
-            <!-- 上传区域 -->
+    <main class="main-content">
+      <section ref="dashboardRef" class="intake-stage">
+        <aside class="intake-rail">
+          <div class="rail-sticky">
+            <span class="section-kicker">How It Works</span>
+            <h2>One intake, five live stages.</h2>
+            <p class="section-intro">
+              JunoFish helps you turn a company question into something you can explore. The setup
+              stays simple so you can get to the useful part faster.
+            </p>
+
+            <div class="stage-list">
+              <div class="stage-item">
+                <span class="stage-index">01</span>
+                <div>
+                  <h3>Graph Construction</h3>
+                  <p>Pull out the key people, groups, and relationships behind the company story.</p>
+                </div>
+              </div>
+              <div class="stage-item">
+                <span class="stage-index">02</span>
+                <div>
+                  <h3>Environment Setup</h3>
+                  <p>Set up the people, channels, and conditions that shape the scenario.</p>
+                </div>
+              </div>
+              <div class="stage-item">
+                <span class="stage-index">03</span>
+                <div>
+                  <h3>Simulation Run</h3>
+                  <p>Watch how reactions build, spread, and change over time.</p>
+                </div>
+              </div>
+              <div class="stage-item">
+                <span class="stage-index">04</span>
+                <div>
+                  <h3>Report Generation</h3>
+                  <p>Get a clearer read on likely outcomes, tradeoffs, and risks.</p>
+                </div>
+              </div>
+              <div class="stage-item">
+                <span class="stage-index">05</span>
+                <div>
+                  <h3>Deep Interaction</h3>
+                  <p>Go back in, ask follow-up questions, and explore what happened in more detail.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rail-signals">
+              <div class="signal-row">
+                <span>Input</span>
+                <strong>Website and docs together</strong>
+              </div>
+              <div class="signal-row">
+                <span>Approach</span>
+                <strong>Build the picture before the answer</strong>
+              </div>
+              <div class="signal-row">
+                <span>Output</span>
+                <strong>Clear recommendation plus saved project</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="console-stage" aria-label="JunoFish intake console">
+          <div class="console-frame">
+            <div class="console-head">
+              <div>
+                <span class="console-kicker">Intake Console</span>
+                <h2>Give JunoFish the basics.</h2>
+              </div>
+              <span class="console-state">
+                {{ consoleStateLabel }}
+              </span>
+            </div>
+
             <div class="console-section">
               <div class="console-header">
-                <span class="console-label">01 / 现实种子</span>
-                <span class="console-meta">支持格式: PDF, MD, TXT</span>
+                <span class="console-label">01 / Company Website URL</span>
+                <span class="console-meta">Optional if you upload source documents</span>
               </div>
-              
-              <div 
+
+              <div class="input-shell">
+                <input
+                  v-model="formData.companyWebsiteUrl"
+                  class="text-input"
+                  type="url"
+                  placeholder="https://www.example.com/"
+                  :disabled="loading"
+                  @blur="urlTouched = true"
+                />
+              </div>
+
+              <p class="field-hint">
+                Use the main company website. JunoFish pulls in the public story and combines it
+                with anything you upload here.
+              </p>
+
+              <p v-if="showCompanyWebsiteUrlError" class="field-error">
+                {{ companyWebsiteUrlError }}
+              </p>
+            </div>
+
+            <div class="console-rule">
+              <span>Source Material</span>
+            </div>
+
+            <div class="console-section">
+              <div class="console-header">
+                <span class="console-label">02 / Documents</span>
+                <span class="console-meta">PDF, MD, TXT</span>
+              </div>
+
+              <div
                 class="upload-zone"
                 :class="{ 'drag-over': isDragOver, 'has-files': files.length > 0 }"
                 @dragover.prevent="handleDragOver"
@@ -145,746 +199,1186 @@
                   style="display: none"
                   :disabled="loading"
                 />
-                
+
                 <div v-if="files.length === 0" class="upload-placeholder">
                   <div class="upload-icon">↑</div>
-                  <div class="upload-title">拖拽文件上传</div>
-                  <div class="upload-hint">或点击浏览文件系统</div>
+                  <div class="upload-title">Drop documents here</div>
+                  <div class="upload-hint">or click to pull from your filesystem</div>
                 </div>
-                
+
                 <div v-else class="file-list">
-                  <div v-for="(file, index) in files" :key="index" class="file-item">
-                    <span class="file-icon">📄</span>
+                  <div v-for="(file, index) in files" :key="`${file.name}-${index}`" class="file-item">
+                    <span class="file-pill">{{ file.name.split('.').pop()?.toUpperCase() || 'FILE' }}</span>
                     <span class="file-name">{{ file.name }}</span>
-                    <button @click.stop="removeFile(index)" class="remove-btn">×</button>
+                    <button @click.stop="removeFile(index)" class="remove-btn" type="button">×</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- 分割线 -->
-            <div class="console-divider">
-              <span>输入参数</span>
+            <div class="console-rule">
+              <span>Decision Prompt</span>
             </div>
 
-            <!-- 输入区域 -->
             <div class="console-section">
               <div class="console-header">
-                <span class="console-label">>_ 02 / 模拟提示词</span>
+                <span class="console-label">03 / Strategy Question</span>
+                <span class="console-meta">What do you want help thinking through?</span>
               </div>
-              <div class="input-wrapper">
+
+              <div class="input-shell textarea-shell">
                 <textarea
                   v-model="formData.simulationRequirement"
                   class="code-input"
-                  placeholder="// 用自然语言输入模拟或预测需求（例.武大若发布撤销肖某处分的公告，会引发什么舆情走向）"
-                  rows="6"
+                  placeholder="// Describe the decision, risk, or opportunity you want to explore"
+                  rows="7"
                   :disabled="loading"
                 ></textarea>
-                <div class="model-badge">引擎: MiroFish-V1.0</div>
+                <div class="model-badge">Engine / JunoFish-V1.0</div>
+              </div>
+
+              <div class="prompt-presets">
+                <button
+                  v-for="preset in suggestedPrompts"
+                  :key="preset.title"
+                  type="button"
+                  class="preset-btn"
+                  @click="applySuggestedPrompt(preset.prompt)"
+                >
+                  <span class="preset-title">{{ preset.title }}</span>
+                  <span class="preset-description">{{ preset.description }}</span>
+                </button>
               </div>
             </div>
 
-            <!-- 启动按钮 -->
-            <div class="console-section btn-section">
-              <button 
-                class="start-engine-btn"
-                @click="startSimulation"
-                :disabled="!canSubmit || loading"
-              >
-                <span v-if="!loading">启动引擎</span>
-                <span v-else>初始化中...</span>
-                <span class="btn-arrow">→</span>
-              </button>
+            <div class="console-footer">
+              <div class="launch-copy">
+                <span>Launch path</span>
+                <strong>{{ launchSupportCopy }}</strong>
+              </div>
+
+              <div class="launch-actions">
+                <p v-if="error" class="field-error submit-error">{{ error }}</p>
+                <button class="start-engine-btn" @click="startSimulation" :disabled="!canSubmit || loading">
+                  <span>{{ launchLabel }}</span>
+                  <span class="btn-arrow">→</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
       </section>
 
-      <!-- 历史项目数据库 -->
-      <HistoryDatabase />
-    </div>
+      <section v-if="session.data?.user" ref="archiveRef" class="archive-stage">
+        <div class="archive-header">
+          <span class="section-kicker">Past Work</span>
+          <h2>Reopen earlier projects and reports.</h2>
+          <p>
+            Signed in as {{ session.data.user.name }}. Jump back into earlier work and pick up
+            where you left off.
+          </p>
+        </div>
+
+        <HistoryDatabase />
+      </section>
+
+      <section v-else class="archive-locked">
+        <div class="archive-locked-copy">
+          <span class="section-kicker">Past Work</span>
+          <h2>You can explore the page without signing in.</h2>
+          <p>
+            Sign in only when you want to reopen earlier projects, save new work, or move into the
+            full app experience.
+          </p>
+        </div>
+
+        <button class="archive-locked-btn" @click="router.push('/auth')">Sign in to view past work</button>
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+
+import heroScene from '../assets/hero/juno-fish-original.jpg'
 import HistoryDatabase from '../components/HistoryDatabase.vue'
+import { authClient } from '../lib/auth-client'
+import { setPendingUpload } from '../store/pendingUpload'
 
 const router = useRouter()
+const session = authClient.useSession()
 
-// 表单数据
+const suggestedPrompts = [
+  {
+    title: 'Next Best Move',
+    description: 'Recommend the strongest direction for the next 12 months.',
+    prompt:
+      'Based on the company website and uploaded documents, suggest the three strongest directions for the next 12 months. Explain how customers, partners, and the market may react, then recommend the best path with reasons, risks, and assumptions.'
+  },
+  {
+    title: 'Growth Focus',
+    description: 'Compare the biggest growth paths and recommend one.',
+    prompt:
+      'Using the company website and uploaded documents, compare three growth options: entering a new market, launching a new product, or sharpening positioning in the current market. Recommend the best option and explain the tradeoffs and execution risks.'
+  },
+  {
+    title: 'Positioning Check',
+    description: 'Find out whether the current message should stay or change.',
+    prompt:
+      'Review the positioning shown on the website and in the uploaded documents. Show how customers, partners, and internal teams might react to a repositioning, then recommend whether the company should stay the course, refine it, or make a bigger change.'
+  }
+]
+
 const formData = ref({
+  companyWebsiteUrl: '',
   simulationRequirement: ''
 })
 
-// 文件列表
 const files = ref([])
-
-// 状态
 const loading = ref(false)
 const error = ref('')
 const isDragOver = ref(false)
-
-// 文件输入引用
+const urlTouched = ref(false)
 const fileInput = ref(null)
+const dashboardRef = ref(null)
+const archiveRef = ref(null)
 
-// 计算属性:是否可以提交
+const companyWebsiteUrlError = computed(() => validateCompanyWebsiteUrl(formData.value.companyWebsiteUrl))
+const showCompanyWebsiteUrlError = computed(() => urlTouched.value && Boolean(companyWebsiteUrlError.value))
 const canSubmit = computed(() => {
-  return formData.value.simulationRequirement.trim() !== '' && files.value.length > 0
+  return formData.value.simulationRequirement.trim() !== '' && !companyWebsiteUrlError.value
 })
 
-// 触发文件选择
+const accessLabel = computed(() => (session.data?.user ? 'Open Archive' : 'Sign In'))
+const consoleStateLabel = computed(() => {
+  return session.data?.user ? 'Signed in / ready to start' : 'Browse now / sign in when you launch'
+})
+const launchLabel = computed(() => {
+  if (loading.value) return 'Preparing intake...'
+  return session.data?.user ? 'Launch JunoFish' : 'Launch and sign in'
+})
+const launchSupportCopy = computed(() => {
+  return session.data?.user
+    ? 'You are signed in. Start here and continue straight into your project.'
+    : 'We will hold your setup, then ask you to sign in before opening the project.'
+})
+
+const isIpv4 = (hostname) => /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname)
+
+const isPrivateOrReservedIpv4 = (hostname) => {
+  const parts = hostname.split('.').map(Number)
+  if (parts.length !== 4 || parts.some((part) => Number.isNaN(part) || part < 0 || part > 255)) {
+    return true
+  }
+  if (parts[0] === 10) return true
+  if (parts[0] === 127) return true
+  if (parts[0] === 169 && parts[1] === 254) return true
+  if (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) return true
+  if (parts[0] === 192 && parts[1] === 168) return true
+  if (parts[0] === 0) return true
+  return false
+}
+
+const validateCompanyWebsiteUrl = (rawUrl) => {
+  const trimmed = (rawUrl || '').trim()
+  if (!trimmed) {
+    return files.value.length === 0
+      ? 'Provide a company website URL or upload at least one document.'
+      : ''
+  }
+
+  let parsed
+  try {
+    parsed = new URL(trimmed)
+  } catch {
+    return 'Please enter a valid URL.'
+  }
+
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    return 'Only public HTTP/HTTPS URLs are supported.'
+  }
+  if (parsed.username || parsed.password) {
+    return 'Credentials in the URL are not allowed.'
+  }
+  if (parsed.port) {
+    return 'Use the root domain URL without a custom port.'
+  }
+  if (parsed.search || parsed.hash) {
+    return 'Use only the root domain URL without query or hash parameters.'
+  }
+  if (parsed.pathname && parsed.pathname !== '/') {
+    return 'Use a single root domain URL, not a specific page path.'
+  }
+
+  const hostname = parsed.hostname.toLowerCase()
+  if (!hostname || !hostname.includes('.') || hostname.endsWith('.')) {
+    return 'Please enter a valid public root domain.'
+  }
+  if (hostname === 'localhost' || hostname.endsWith('.local') || hostname.endsWith('.internal')) {
+    return 'Local or private hostnames are not allowed.'
+  }
+  if (hostname.includes(':')) {
+    return 'Please use a public domain instead of an IP address.'
+  }
+  if (isIpv4(hostname) && isPrivateOrReservedIpv4(hostname)) {
+    return 'Private or reserved IP addresses are not allowed.'
+  }
+  if (isIpv4(hostname)) {
+    return 'Please use a public company domain rather than an IP address.'
+  }
+
+  return ''
+}
+
 const triggerFileInput = () => {
   if (!loading.value) {
     fileInput.value?.click()
   }
 }
 
-// 处理文件选择
 const handleFileSelect = (event) => {
-  const selectedFiles = Array.from(event.target.files)
-  addFiles(selectedFiles)
+  addFiles(Array.from(event.target.files || []))
 }
 
-// 处理拖拽相关
-const handleDragOver = (e) => {
+const handleDragOver = () => {
   if (!loading.value) {
     isDragOver.value = true
   }
 }
 
-const handleDragLeave = (e) => {
+const handleDragLeave = () => {
   isDragOver.value = false
 }
 
-const handleDrop = (e) => {
+const handleDrop = (event) => {
   isDragOver.value = false
   if (loading.value) return
-  
-  const droppedFiles = Array.from(e.dataTransfer.files)
-  addFiles(droppedFiles)
+  addFiles(Array.from(event.dataTransfer.files || []))
 }
 
-// 添加文件
 const addFiles = (newFiles) => {
-  const validFiles = newFiles.filter(file => {
-    const ext = file.name.split('.').pop().toLowerCase()
+  const validFiles = newFiles.filter((file) => {
+    const ext = file.name?.split('.').pop()?.toLowerCase()
     return ['pdf', 'md', 'txt'].includes(ext)
   })
-  files.value.push(...validFiles)
+
+  const seen = new Set(files.value.map((file) => `${file.name}:${file.size}:${file.lastModified}`))
+  const nextFiles = [...files.value]
+
+  validFiles.forEach((file) => {
+    const key = `${file.name}:${file.size}:${file.lastModified}`
+    if (!seen.has(key)) {
+      seen.add(key)
+      nextFiles.push(file)
+    }
+  })
+
+  files.value = nextFiles
 }
 
-// 移除文件
 const removeFile = (index) => {
-  files.value.splice(index, 1)
+  files.value = files.value.filter((_, currentIndex) => currentIndex !== index)
 }
 
-// 滚动到底部
-const scrollToBottom = () => {
-  window.scrollTo({
-    top: document.body.scrollHeight,
-    behavior: 'smooth'
+const applySuggestedPrompt = (prompt) => {
+  formData.value.simulationRequirement = prompt
+}
+
+const scrollToSetup = () => {
+  dashboardRef.value?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
   })
 }
 
-// 开始模拟 - 立即跳转，API调用在Process页面进行
-const startSimulation = () => {
-  if (!canSubmit.value || loading.value) return
-  
-  // 存储待上传的数据
-  import('../store/pendingUpload.js').then(({ setPendingUpload }) => {
-    setPendingUpload(files.value, formData.value.simulationRequirement)
-    
-    // 立即跳转到Process页面（使用特殊标识表示新建项目）
-    router.push({
-      name: 'Process',
-      params: { projectId: 'new' }
+const handleAccess = () => {
+  if (session.data?.user) {
+    archiveRef.value?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
     })
+    return
+  }
+
+  router.push('/auth')
+}
+
+const startSimulation = () => {
+  urlTouched.value = true
+  error.value = ''
+
+  if (!canSubmit.value || loading.value) {
+    if (!formData.value.simulationRequirement.trim()) {
+      error.value = 'Add the question you want to explore before launching.'
+    }
+    return
+  }
+
+  setPendingUpload(
+    files.value,
+    formData.value.simulationRequirement.trim(),
+    formData.value.companyWebsiteUrl.trim()
+  )
+
+  router.push({
+    name: 'Process',
+    params: { projectId: 'new' }
   })
 }
 </script>
 
 <style scoped>
-/* 全局变量与重置 */
-:root {
-  --black: #000000;
-  --white: #FFFFFF;
-  --orange: #FF4500;
-  --gray-light: #F5F5F5;
-  --gray-text: #666666;
-  --border: #E5E5E5;
-  /* 
-    使用 Space Grotesk 作为主要标题字体，JetBrains Mono 作为代码/标签字体
-    确保已在 index.html 引入这些 Google Fonts 
-  */
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
-  --font-cn: 'Noto Sans SC', system-ui, sans-serif;
-}
-
 .home-container {
+  --ink: #071017;
+  --ink-soft: rgba(7, 16, 23, 0.72);
+  --paper: #f3eee6;
+  --paper-warm: #e7ddd0;
+  --sand: #f7f2eb;
+  --orange: #ff7a3d;
+  --orange-soft: rgba(255, 122, 61, 0.12);
+  --line: rgba(7, 16, 23, 0.14);
   min-height: 100vh;
-  background: var(--white);
-  font-family: var(--font-sans);
-  color: var(--black);
+  background: linear-gradient(180deg, #10181e 0%, #efe7dc 42%, #f7f2eb 100%);
+  color: var(--ink);
+  font-family: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
 }
 
-/* 顶部导航 */
+.hero-stage {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  color: #ffffff;
+  background: #091117;
+}
+
+.hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.05);
+  animation: heroDrift 18s ease-in-out infinite alternate;
+}
+
+.hero-film {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(6, 12, 16, 0.9) 0%, rgba(6, 12, 16, 0.72) 38%, rgba(6, 12, 16, 0.34) 72%, rgba(6, 12, 16, 0.18) 100%),
+    linear-gradient(180deg, rgba(6, 12, 16, 0.18) 0%, rgba(6, 12, 16, 0.12) 100%);
+}
+
+.hero-grain {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.85));
+  opacity: 0.25;
+}
+
+.navbar,
+.hero-layout,
+.main-content {
+  width: min(1480px, calc(100% - 48px));
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
 .navbar {
-  height: 60px;
-  background: var(--black);
-  color: var(--white);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  justify-content: space-between;
+  padding-top: 26px;
 }
 
 .nav-brand {
-  font-family: var(--font-mono);
-  font-weight: 800;
-  letter-spacing: 1px;
-  font-size: 1.2rem;
+  display: grid;
+  gap: 4px;
 }
 
-.nav-links {
-  display: flex;
-  align-items: center;
+.nav-mark,
+.nav-cta,
+.hero-kicker,
+.ledger-index,
+.section-kicker,
+.console-kicker,
+.console-label,
+.console-meta,
+.model-badge,
+.signal-row span,
+.file-pill,
+.archive-locked-btn,
+.hero-primary-btn,
+.hero-secondary-btn {
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.github-link {
-  color: var(--white);
-  text-decoration: none;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: opacity 0.2s;
-}
-
-.github-link:hover {
-  opacity: 0.8;
-}
-
-.arrow {
-  font-family: sans-serif;
-}
-
-/* 主要内容区 */
-.main-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 60px 40px;
-}
-
-/* Hero 区域 */
-.hero-section {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 80px;
-  position: relative;
-}
-
-.hero-left {
-  flex: 1;
-  padding-right: 60px;
-}
-
-.tag-row {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 25px;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-}
-
-.orange-tag {
-  background: var(--orange);
-  color: var(--white);
-  padding: 4px 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  font-size: 0.75rem;
-}
-
-.version-text {
-  color: #999;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
-.main-title {
-  font-size: 4.5rem;
-  line-height: 1.2;
-  font-weight: 500;
-  margin: 0 0 40px 0;
-  letter-spacing: -2px;
-  color: var(--black);
-}
-
-.gradient-text {
-  background: linear-gradient(90deg, #000000 0%, #444444 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-}
-
-.hero-desc {
-  font-size: 1.05rem;
-  line-height: 1.8;
-  color: var(--gray-text);
-  max-width: 640px;
-  margin-bottom: 50px;
-  font-weight: 400;
-  text-align: justify;
-}
-
-.hero-desc p {
-  margin-bottom: 1.5rem;
-}
-
-.highlight-bold {
-  color: var(--black);
-  font-weight: 700;
-}
-
-.highlight-orange {
-  color: var(--orange);
-  font-weight: 700;
-  font-family: var(--font-mono);
-}
-
-.highlight-code {
-  background: rgba(0, 0, 0, 0.05);
-  padding: 2px 6px;
-  border-radius: 2px;
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-  color: var(--black);
-  font-weight: 600;
-}
-
-.slogan-text {
-  font-size: 1.2rem;
-  font-weight: 520;
-  color: var(--black);
-  letter-spacing: 1px;
-  border-left: 3px solid var(--orange);
-  padding-left: 15px;
-  margin-top: 20px;
-}
-
-.blinking-cursor {
-  color: var(--orange);
-  animation: blink 1s step-end infinite;
-  font-weight: 700;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.decoration-square {
-  width: 16px;
-  height: 16px;
-  background: var(--orange);
-}
-
-.hero-right {
-  flex: 0.8;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.logo-container {
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  padding-right: 40px;
-}
-
-.hero-logo {
-  max-width: 500px; /* 调整logo大小 */
-  width: 100%;
-}
-
-.scroll-down-btn {
-  width: 40px;
-  height: 40px;
-  border: 1px solid var(--border);
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--orange);
-  font-size: 1.2rem;
-  transition: all 0.2s;
-}
-
-.scroll-down-btn:hover {
-  border-color: var(--orange);
-}
-
-/* Dashboard 双栏布局 */
-.dashboard-section {
-  display: flex;
-  gap: 60px;
-  border-top: 1px solid var(--border);
-  padding-top: 60px;
-  align-items: flex-start;
-}
-
-.dashboard-section .left-panel,
-.dashboard-section .right-panel {
-  display: flex;
-  flex-direction: column;
-}
-
-/* 左侧面板 */
-.left-panel {
-  flex: 0.8;
-}
-
-.panel-header {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: #999;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.status-dot {
-  color: var(--orange);
-  font-size: 0.8rem;
-}
-
-.section-title {
-  font-size: 2rem;
-  font-weight: 520;
-  margin: 0 0 15px 0;
-}
-
-.section-desc {
-  color: var(--gray-text);
-  margin-bottom: 25px;
-  line-height: 1.6;
-}
-
-.metrics-row {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 15px;
-}
-
-.metric-card {
-  border: 1px solid var(--border);
-  padding: 20px 30px;
-  min-width: 150px;
-}
-
-.metric-value {
-  font-family: var(--font-mono);
-  font-size: 1.8rem;
-  font-weight: 520;
-  margin-bottom: 5px;
-}
-
-.metric-label {
-  font-size: 0.85rem;
-  color: #999;
-}
-
-/* 项目模拟步骤介绍 */
-.steps-container {
-  border: 1px solid var(--border);
-  padding: 30px;
-  position: relative;
-}
-
-.steps-header {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: #999;
-  margin-bottom: 25px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.diamond-icon {
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-.workflow-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.workflow-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-}
-
-.step-num {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--black);
-  opacity: 0.3;
-}
-
-.step-info {
-  flex: 1;
-}
-
-.step-title {
-  font-weight: 520;
+.nav-mark {
   font-size: 1rem;
-  margin-bottom: 4px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
 }
 
-.step-desc {
-  font-size: 0.85rem;
-  color: var(--gray-text);
+.nav-meta {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
 }
 
-/* 右侧交互控制台 */
-.right-panel {
-  flex: 1.2;
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.console-box {
-  border: 1px solid #CCC; /* 外部实线 */
-  padding: 8px; /* 内边距形成双重边框感 */
+.nav-cta {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  padding: 12px 16px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(14px);
+}
+
+.nav-cta {
+  cursor: pointer;
+}
+
+.hero-layout {
+  min-height: calc(100svh - 94px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.56fr);
+  align-items: end;
+  gap: 56px;
+  padding-bottom: 56px;
+}
+
+.hero-copy {
+  max-width: 760px;
+  padding-top: 80px;
+}
+
+.hero-copy > * {
+  opacity: 0;
+  transform: translateY(22px);
+  animation: heroReveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-copy > *:nth-child(1) {
+  animation-delay: 0.08s;
+}
+
+.hero-copy > *:nth-child(2) {
+  animation-delay: 0.16s;
+}
+
+.hero-copy > *:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.hero-copy > *:nth-child(4) {
+  animation-delay: 0.32s;
+}
+
+.hero-copy > *:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+.hero-copy > *:nth-child(6) {
+  animation-delay: 0.48s;
+}
+
+.hero-kicker {
+  margin-bottom: 18px;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.hero-brand {
+  font-size: clamp(4.2rem, 11vw, 8.6rem);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+}
+
+.hero-headline {
+  max-width: 660px;
+  margin-top: 20px;
+  font-size: clamp(1.6rem, 3.6vw, 3rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.hero-body {
+  max-width: 560px;
+  margin-top: 22px;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.hero-primary-btn,
+.hero-secondary-btn {
+  border: 0;
+  padding: 14px 20px;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.22s ease, background 0.22s ease, border-color 0.22s ease;
+}
+
+.hero-primary-btn {
+  background: var(--orange);
+  color: #111111;
+}
+
+.hero-secondary-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.hero-primary-btn:hover,
+.hero-secondary-btn:hover,
+.nav-cta:hover,
+.archive-locked-btn:hover,
+.start-engine-btn:hover {
+  transform: translateY(-2px);
+}
+
+.hero-footnote {
+  max-width: 620px;
+  margin-top: 18px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-ledger {
+  display: grid;
+  gap: 18px;
+  align-self: end;
+  padding-bottom: 10px;
+}
+
+.ledger-line {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  opacity: 0;
+  transform: translateY(22px);
+  animation: heroReveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.ledger-line:nth-child(1) {
+  animation-delay: 0.38s;
+}
+
+.ledger-line:nth-child(2) {
+  animation-delay: 0.48s;
+}
+
+.ledger-line:nth-child(3) {
+  animation-delay: 0.58s;
+}
+
+.ledger-index {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.ledger-line strong {
+  display: block;
+  font-size: 0.96rem;
+}
+
+.ledger-line p {
+  margin-top: 6px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.main-content {
+  padding-top: 48px;
+  padding-bottom: 88px;
+}
+
+.intake-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.rail-sticky {
+  position: sticky;
+  top: 28px;
+  display: grid;
+  gap: 24px;
+}
+
+.section-kicker {
+  display: inline-flex;
+  color: var(--orange);
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+}
+
+.intake-rail h2,
+.archive-header h2,
+.archive-locked h2,
+.console-head h2 {
+  font-size: clamp(2.1rem, 4vw, 3.4rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+}
+
+.section-intro,
+.archive-header p,
+.archive-locked p {
+  max-width: 520px;
+  color: var(--ink-soft);
+  line-height: 1.72;
+}
+
+.stage-list {
+  display: grid;
+  gap: 14px;
+}
+
+.stage-item {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  transition: transform 0.24s ease, border-color 0.24s ease;
+}
+
+.stage-item:hover {
+  transform: translateX(6px);
+  border-color: rgba(255, 122, 61, 0.38);
+}
+
+.stage-index {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--orange);
+}
+
+.stage-item h3 {
+  font-size: 1rem;
+}
+
+.stage-item p {
+  margin-top: 5px;
+  color: var(--ink-soft);
+  line-height: 1.58;
+}
+
+.rail-signals {
+  display: grid;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.signal-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(7, 16, 23, 0.08);
+}
+
+.signal-row span {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: rgba(7, 16, 23, 0.48);
+}
+
+.signal-row strong {
+  font-size: 0.95rem;
+}
+
+.console-frame {
+  padding: 30px;
+  border: 1px solid rgba(7, 16, 23, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 242, 234, 0.96)),
+    radial-gradient(circle at top right, rgba(255, 122, 61, 0.08), transparent 28%);
+  box-shadow: 0 28px 80px rgba(7, 16, 23, 0.08);
+}
+
+.console-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(7, 16, 23, 0.08);
+}
+
+.console-kicker {
+  display: inline-flex;
+  margin-bottom: 10px;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  color: var(--orange);
+}
+
+.console-state {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  color: rgba(7, 16, 23, 0.5);
+  text-transform: uppercase;
 }
 
 .console-section {
-  padding: 20px;
-}
-
-.console-section.btn-section {
-  padding-top: 0;
+  display: grid;
+  gap: 12px;
+  padding: 24px 0;
 }
 
 .console-header {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 15px;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: #666;
+  gap: 16px;
 }
 
-.upload-zone {
-  border: 1px dashed #CCC;
-  height: 200px;
-  overflow-y: auto;
+.console-label {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  color: rgba(7, 16, 23, 0.86);
+}
+
+.console-meta {
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  color: rgba(7, 16, 23, 0.46);
+}
+
+.console-rule {
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  background: #FAFAFA;
+  gap: 16px;
+  color: rgba(7, 16, 23, 0.42);
 }
 
-.upload-zone.has-files {
-  align-items: flex-start;
-}
-
-.upload-zone:hover {
-  background: #F0F0F0;
-  border-color: #999;
-}
-
-.upload-placeholder {
-  text-align: center;
-}
-
-.upload-icon {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #DDD;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 15px;
-  color: #999;
-}
-
-.upload-title {
-  font-weight: 500;
-  font-size: 0.9rem;
-  margin-bottom: 5px;
-}
-
-.upload-hint {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: #999;
-}
-
-.file-list {
-  width: 100%;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.file-item {
-  display: flex;
-  align-items: center;
-  background: var(--white);
-  padding: 8px 12px;
-  border: 1px solid #EEE;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-}
-
-.file-name {
-  flex: 1;
-  margin: 0 10px;
-}
-
-.remove-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: #999;
-}
-
-.console-divider {
-  display: flex;
-  align-items: center;
-  margin: 10px 0;
-}
-
-.console-divider::before,
-.console-divider::after {
+.console-rule::before,
+.console-rule::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: #EEE;
+  background: rgba(7, 16, 23, 0.08);
 }
 
-.console-divider span {
-  padding: 0 15px;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #BBB;
-  letter-spacing: 1px;
+.console-rule span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.input-wrapper {
-  position: relative;
-  border: 1px solid #DDD;
-  background: #FAFAFA;
+.input-shell {
+  border: 1px solid rgba(7, 16, 23, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.text-input,
+.code-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 18px 18px 16px;
+  font: inherit;
+  color: var(--ink);
+  outline: none;
+}
+
+.text-input {
+  font-size: 1rem;
 }
 
 .code-input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  padding: 20px;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  line-height: 1.6;
+  min-height: 188px;
   resize: vertical;
-  outline: none;
-  min-height: 150px;
+  line-height: 1.65;
+}
+
+.textarea-shell {
+  position: relative;
 }
 
 .model-badge {
   position: absolute;
-  bottom: 10px;
-  right: 15px;
-  font-family: var(--font-mono);
+  right: 16px;
+  bottom: 14px;
   font-size: 0.7rem;
-  color: #AAA;
+  letter-spacing: 0.08em;
+  color: rgba(7, 16, 23, 0.42);
+}
+
+.field-hint {
+  max-width: 680px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.field-error {
+  color: #b12b00;
+  line-height: 1.55;
+}
+
+.upload-zone {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(7, 16, 23, 0.18);
+  background: rgba(255, 255, 255, 0.54);
+  cursor: pointer;
+  transition: border-color 0.22s ease, background 0.22s ease, transform 0.22s ease;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: rgba(255, 122, 61, 0.42);
+  background: rgba(255, 248, 242, 0.92);
+  transform: translateY(-1px);
+}
+
+.upload-zone.has-files {
+  place-items: stretch;
+}
+
+.upload-placeholder {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 22px;
+  text-align: center;
+}
+
+.upload-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(7, 16, 23, 0.12);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.upload-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.upload-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  color: rgba(7, 16, 23, 0.5);
+}
+
+.file-list {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.file-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(7, 16, 23, 0.08);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.file-pill {
+  display: inline-flex;
+  padding: 5px 8px;
+  background: rgba(255, 122, 61, 0.1);
+  color: #9b3f16;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.file-name {
+  min-width: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-btn {
+  border: 0;
+  background: transparent;
+  color: rgba(7, 16, 23, 0.5);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.prompt-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.preset-btn {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid rgba(7, 16, 23, 0.08);
+  background: rgba(255, 255, 255, 0.62);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+}
+
+.preset-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 122, 61, 0.32);
+  background: rgba(255, 248, 242, 0.96);
+}
+
+.preset-title {
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+}
+
+.preset-description {
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.console-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
+  gap: 18px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(7, 16, 23, 0.08);
+}
+
+.launch-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.launch-copy span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  color: rgba(7, 16, 23, 0.48);
+}
+
+.launch-copy strong {
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.launch-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.submit-error {
+  margin: 0;
 }
 
 .start-engine-btn {
-  width: 100%;
-  background: var(--black);
-  color: var(--white);
-  border: none;
-  padding: 20px;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 1.1rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 0;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #071017 0%, #183446 100%);
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.84rem;
+  letter-spacing: 0.08em;
   cursor: pointer;
-  transition: all 0.3s ease;
-  letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* 可点击状态（非禁用） */
-.start-engine-btn:not(:disabled) {
-  background: var(--black);
-  border: 1px solid var(--black);
-  animation: pulse-border 2s infinite;
-}
-
-.start-engine-btn:hover:not(:disabled) {
-  background: var(--orange);
-  border-color: var(--orange);
-  transform: translateY(-2px);
-}
-
-.start-engine-btn:active:not(:disabled) {
-  transform: translateY(0);
+  transition: transform 0.22s ease, opacity 0.22s ease;
 }
 
 .start-engine-btn:disabled {
-  background: #E5E5E5;
-  color: #999;
+  opacity: 0.58;
   cursor: not-allowed;
-  transform: none;
-  border: 1px solid #E5E5E5;
 }
 
-/* 引导动画：微妙的边框脉冲 */
-@keyframes pulse-border {
-  0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2); }
-  70% { box-shadow: 0 0 0 6px rgba(0, 0, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+.btn-arrow {
+  font-size: 1rem;
 }
 
-/* 响应式适配 */
-@media (max-width: 1024px) {
-  .dashboard-section {
+.archive-stage,
+.archive-locked {
+  margin-top: 72px;
+}
+
+.archive-header {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.archive-locked {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(7, 16, 23, 0.08);
+}
+
+.archive-locked-copy {
+  display: grid;
+  gap: 16px;
+}
+
+.archive-locked-btn {
+  border: 0;
+  padding: 15px 18px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+@keyframes heroReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroDrift {
+  0% {
+    transform: scale(1.05) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.1) translate3d(-1.5%, 1%, 0);
+  }
+}
+
+@media (max-width: 1100px) {
+  .hero-layout,
+  .intake-stage,
+  .console-footer,
+  .archive-locked {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-layout {
+    align-items: end;
+    gap: 32px;
+  }
+
+  .hero-ledger {
+    max-width: 520px;
+  }
+
+  .rail-sticky {
+    position: static;
+  }
+
+  .archive-locked {
+    align-items: start;
+  }
+}
+
+@media (max-width: 820px) {
+  .navbar,
+  .hero-layout,
+  .main-content {
+    width: min(100%, calc(100% - 32px));
+  }
+
+  .navbar {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
-  
-  .hero-section {
+
+  .hero-stage {
+    min-height: auto;
+    padding-bottom: 34px;
+  }
+
+  .hero-layout {
+    min-height: auto;
+    padding-top: 44px;
+    padding-bottom: 12px;
+  }
+
+  .hero-copy {
+    padding-top: 12px;
+  }
+
+  .hero-brand {
+    font-size: clamp(3.3rem, 18vw, 5.4rem);
+  }
+
+  .hero-actions,
+  .nav-actions {
+    width: 100%;
     flex-direction: column;
+    align-items: stretch;
   }
-  
-  .hero-left {
-    padding-right: 0;
-    margin-bottom: 40px;
+
+  .console-head,
+  .console-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .hero-logo {
-    max-width: 200px;
-    margin-bottom: 20px;
+
+  .prompt-presets {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .console-frame {
+    padding: 22px 18px;
+  }
+
+  .stage-item {
+    grid-template-columns: 40px 1fr;
+  }
+
+  .file-item {
+    grid-template-columns: 1fr auto;
+  }
+
+  .file-pill {
+    display: none;
   }
 }
 </style>

@@ -1,54 +1,68 @@
 """
-配置管理
-统一从项目根目录的 .env 文件加载配置
+Configuration management.
+Loads configuration consistently from the repository root `.env` file.
 """
 
 import os
 from dotenv import load_dotenv
 
-# 加载项目根目录的 .env 文件
-# 路径: MiroFish/.env (相对于 backend/app/config.py)
+# Load the repository root `.env` file
+# Path: `MiroFish/.env` (relative to `backend/app/config.py`)
 project_root_env = os.path.join(os.path.dirname(__file__), '../../.env')
 
 if os.path.exists(project_root_env):
     load_dotenv(project_root_env, override=True)
 else:
-    # 如果根目录没有 .env，尝试加载环境变量（用于生产环境）
+    # If the repository root does not have a `.env`, fall back to environment variables (for production)
     load_dotenv(override=True)
 
 
 class Config:
-    """Flask配置类"""
+    """Flask configuration."""
     
-    # Flask配置
+    # Flask settings
     SECRET_KEY = os.environ.get('SECRET_KEY', 'mirofish-secret-key')
     DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
+    FRONTEND_ORIGIN = os.environ.get('FRONTEND_ORIGIN', 'http://localhost:3000')
+    AUTH_SERVICE_URL = os.environ.get('AUTH_SERVICE_URL', 'http://localhost:5002')
+    AUTH_SESSION_ENDPOINT = os.environ.get('AUTH_SESSION_ENDPOINT', f'{AUTH_SERVICE_URL}/api/session')
+    AUTH_SESSION_TIMEOUT = float(os.environ.get('AUTH_SESSION_TIMEOUT', '5'))
     
-    # JSON配置 - 禁用ASCII转义，让中文直接显示（而不是 \uXXXX 格式）
+    # JSON settings - disable ASCII escaping so non-ASCII text is emitted directly instead of as \uXXXX escapes
     JSON_AS_ASCII = False
     
-    # LLM配置（统一使用OpenAI格式）
+    # LLM settings (using the OpenAI-compatible format)
     LLM_API_KEY = os.environ.get('LLM_API_KEY')
     LLM_BASE_URL = os.environ.get('LLM_BASE_URL', 'https://api.openai.com/v1')
     LLM_MODEL_NAME = os.environ.get('LLM_MODEL_NAME', 'gpt-4o-mini')
     
-    # Zep配置
+    # Zep settings
     ZEP_API_KEY = os.environ.get('ZEP_API_KEY')
     
-    # 文件上传配置
+    # File upload settings
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50MB
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '../uploads')
     ALLOWED_EXTENSIONS = {'pdf', 'md', 'txt', 'markdown'}
+
+    # Firecrawl website ingestion settings
+    FIRECRAWL_API_KEY = os.environ.get('FIRECRAWL_API_KEY')
+    FIRECRAWL_BASE_URL = os.environ.get('FIRECRAWL_BASE_URL', 'https://api.firecrawl.dev')
+    FIRECRAWL_CRAWL_LIMIT = int(os.environ.get('FIRECRAWL_CRAWL_LIMIT', '20'))
+    FIRECRAWL_MAX_DISCOVERY_DEPTH = int(os.environ.get('FIRECRAWL_MAX_DISCOVERY_DEPTH', '2'))
+    FIRECRAWL_TIMEOUT_SECONDS = int(os.environ.get('FIRECRAWL_TIMEOUT_SECONDS', '90'))
+    FIRECRAWL_POLL_INTERVAL_SECONDS = float(os.environ.get('FIRECRAWL_POLL_INTERVAL_SECONDS', '2'))
+    FIRECRAWL_MIN_PAGE_WORDS = int(os.environ.get('FIRECRAWL_MIN_PAGE_WORDS', '80'))
+    FIRECRAWL_MAX_PAGE_CHARACTERS = int(os.environ.get('FIRECRAWL_MAX_PAGE_CHARACTERS', '12000'))
     
-    # 文本处理配置
-    DEFAULT_CHUNK_SIZE = 500  # 默认切块大小
-    DEFAULT_CHUNK_OVERLAP = 50  # 默认重叠大小
+    # Text processing settings
+    DEFAULT_CHUNK_SIZE = 500  # Default chunk size
+    DEFAULT_CHUNK_OVERLAP = 50  # Default overlap size
     
-    # OASIS模拟配置
+    # OASIS simulation settings
     OASIS_DEFAULT_MAX_ROUNDS = int(os.environ.get('OASIS_DEFAULT_MAX_ROUNDS', '10'))
     OASIS_SIMULATION_DATA_DIR = os.path.join(os.path.dirname(__file__), '../uploads/simulations')
     
-    # OASIS平台可用动作配置
+    # Available OASIS platform actions
     OASIS_TWITTER_ACTIONS = [
         'CREATE_POST', 'LIKE_POST', 'REPOST', 'FOLLOW', 'DO_NOTHING', 'QUOTE_POST'
     ]
@@ -58,18 +72,28 @@ class Config:
         'TREND', 'REFRESH', 'DO_NOTHING', 'FOLLOW', 'MUTE'
     ]
     
-    # Report Agent配置
+    # Report Agent settings
     REPORT_AGENT_MAX_TOOL_CALLS = int(os.environ.get('REPORT_AGENT_MAX_TOOL_CALLS', '5'))
     REPORT_AGENT_MAX_REFLECTION_ROUNDS = int(os.environ.get('REPORT_AGENT_MAX_REFLECTION_ROUNDS', '2'))
     REPORT_AGENT_TEMPERATURE = float(os.environ.get('REPORT_AGENT_TEMPERATURE', '0.5'))
+
+    @classmethod
+    def get_cors_origins(cls):
+        """Return the list of frontend origins allowed to access the backend API."""
+        raw_origins = os.environ.get('BACKEND_CORS_ORIGINS')
+        if raw_origins:
+            origins = [origin.strip() for origin in raw_origins.split(',') if origin.strip()]
+            if origins:
+                return origins
+
+        return [cls.FRONTEND_ORIGIN, 'http://127.0.0.1:3000']
     
     @classmethod
     def validate(cls):
-        """验证必要配置"""
+        """Validate required configuration values."""
         errors = []
         if not cls.LLM_API_KEY:
-            errors.append("LLM_API_KEY 未配置")
+            errors.append("LLM_API_KEY is not configured")
         if not cls.ZEP_API_KEY:
-            errors.append("ZEP_API_KEY 未配置")
+            errors.append("ZEP_API_KEY is not configured")
         return errors
-
