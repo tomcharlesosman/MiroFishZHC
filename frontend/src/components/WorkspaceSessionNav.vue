@@ -25,16 +25,21 @@ import { authClient } from '../lib/auth-client'
 const router = useRouter()
 const session = authClient.useSession()
 const isSigningOut = ref(false)
+const walletAddress = computed(() => session.data?.user?.walletAddress || '')
+const shortWalletAddress = computed(() => {
+  const address = walletAddress.value
+  return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''
+})
 
 const displayName = computed(() => {
   const name = session.data?.user?.name?.trim()
-  if (name) return name
+  if (name && name !== walletAddress.value) return name
 
   const email = session.data?.user?.email || ''
-  return email.split('@')[0] || 'Workspace'
+  return email.split('@')[0] || shortWalletAddress.value || 'Workspace'
 })
 
-const displayEmail = computed(() => session.data?.user?.email || '')
+const displayEmail = computed(() => session.data?.user?.email || shortWalletAddress.value)
 
 const initials = computed(() => {
   const seed = displayName.value

@@ -1,10 +1,10 @@
 import axios from 'axios'
+import { getAccessToken } from '../lib/auth-client'
 
 // Create the Axios instance
 const service = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '',
   timeout: 300000, // 5-minute timeout; ontology generation can take a while
-  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -12,7 +12,15 @@ const service = axios.create({
 
 // Request interceptor
 service.interceptors.request.use(
-  config => {
+  async (config) => {
+    const accessToken = await getAccessToken().catch(() => null)
+
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`
+    } else if (config.headers?.Authorization) {
+      delete config.headers.Authorization
+    }
+
     return config
   },
   error => {
@@ -25,13 +33,13 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   response => {
     const res = response.data
-    
+
     // Throw if the API payload does not report success
     if (!res.success && res.success !== undefined) {
       console.error('API Error:', res.error || res.message || 'Unknown error')
       return Promise.reject(new Error(res.error || res.message || 'Error'))
     }
-    
+
     return res
   },
   error => {
@@ -41,17 +49,17 @@ service.interceptors.response.use(
       const redirect = `${window.location.pathname}${window.location.search}${window.location.hash}`
       window.location.href = `/auth?redirect=${encodeURIComponent(redirect)}`
     }
-    
+
     // Handle timeouts
     if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
       console.error('Request timeout')
     }
-    
+
     // Handle network errors
     if (error.message === 'Network Error') {
       console.error('Network error - please check your connection')
     }
-    
+
     return Promise.reject(error)
   }
 )
@@ -62,8 +70,12 @@ export const requestWithRetry = async (requestFn, maxRetries = 3, delay = 1000) 
     try {
       return await requestFn()
     } catch (error) {
+      if (error.response?.status && [400, 401, 403, 404].includes(error.response.status)) {
+        throw error
+      }
+
       if (i === maxRetries - 1) throw error
-      
+
       console.warn(`Request failed, retrying (${i + 1}/${maxRetries})...`)
       await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)))
     }

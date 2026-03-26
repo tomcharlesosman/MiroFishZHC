@@ -19,26 +19,26 @@ else:
 
 class Config:
     """Flask configuration."""
-    
+
     # Flask settings
     SECRET_KEY = os.environ.get('SECRET_KEY', 'mirofish-secret-key')
     DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     FRONTEND_ORIGIN = os.environ.get('FRONTEND_ORIGIN', 'http://localhost:3000')
-    AUTH_SERVICE_URL = os.environ.get('AUTH_SERVICE_URL', 'http://localhost:5002')
-    AUTH_SESSION_ENDPOINT = os.environ.get('AUTH_SESSION_ENDPOINT', f'{AUTH_SERVICE_URL}/api/session')
-    AUTH_SESSION_TIMEOUT = float(os.environ.get('AUTH_SESSION_TIMEOUT', '5'))
-    
+    PRIVY_APP_ID = os.environ.get('PRIVY_APP_ID')
+    PRIVY_TOKEN_ISSUER = os.environ.get('PRIVY_TOKEN_ISSUER', 'privy.io')
+    PRIVY_VERIFICATION_KEY = (os.environ.get('PRIVY_VERIFICATION_KEY') or '').replace('\\n', '\n') or None
+
     # JSON settings - disable ASCII escaping so non-ASCII text is emitted directly instead of as \uXXXX escapes
     JSON_AS_ASCII = False
-    
+
     # LLM settings (using the OpenAI-compatible format)
     LLM_API_KEY = os.environ.get('LLM_API_KEY')
     LLM_BASE_URL = os.environ.get('LLM_BASE_URL', 'https://api.openai.com/v1')
     LLM_MODEL_NAME = os.environ.get('LLM_MODEL_NAME', 'gpt-4o-mini')
-    
+
     # Zep settings
     ZEP_API_KEY = os.environ.get('ZEP_API_KEY')
-    
+
     # File upload settings
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50MB
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '../uploads')
@@ -53,15 +53,15 @@ class Config:
     FIRECRAWL_POLL_INTERVAL_SECONDS = float(os.environ.get('FIRECRAWL_POLL_INTERVAL_SECONDS', '2'))
     FIRECRAWL_MIN_PAGE_WORDS = int(os.environ.get('FIRECRAWL_MIN_PAGE_WORDS', '80'))
     FIRECRAWL_MAX_PAGE_CHARACTERS = int(os.environ.get('FIRECRAWL_MAX_PAGE_CHARACTERS', '12000'))
-    
+
     # Text processing settings
     DEFAULT_CHUNK_SIZE = 500  # Default chunk size
     DEFAULT_CHUNK_OVERLAP = 50  # Default overlap size
-    
+
     # OASIS simulation settings
     OASIS_DEFAULT_MAX_ROUNDS = int(os.environ.get('OASIS_DEFAULT_MAX_ROUNDS', '10'))
     OASIS_SIMULATION_DATA_DIR = os.path.join(os.path.dirname(__file__), '../uploads/simulations')
-    
+
     # Available OASIS platform actions
     OASIS_TWITTER_ACTIONS = [
         'CREATE_POST', 'LIKE_POST', 'REPOST', 'FOLLOW', 'DO_NOTHING', 'QUOTE_POST'
@@ -71,7 +71,7 @@ class Config:
         'LIKE_COMMENT', 'DISLIKE_COMMENT', 'SEARCH_POSTS', 'SEARCH_USER',
         'TREND', 'REFRESH', 'DO_NOTHING', 'FOLLOW', 'MUTE'
     ]
-    
+
     # Report Agent settings
     REPORT_AGENT_MAX_TOOL_CALLS = int(os.environ.get('REPORT_AGENT_MAX_TOOL_CALLS', '5'))
     REPORT_AGENT_MAX_REFLECTION_ROUNDS = int(os.environ.get('REPORT_AGENT_MAX_REFLECTION_ROUNDS', '2'))
@@ -87,7 +87,7 @@ class Config:
                 return origins
 
         return [cls.FRONTEND_ORIGIN, 'http://127.0.0.1:3000']
-    
+
     @classmethod
     def validate(cls):
         """Validate required configuration values."""
@@ -96,4 +96,8 @@ class Config:
             errors.append("LLM_API_KEY is not configured")
         if not cls.ZEP_API_KEY:
             errors.append("ZEP_API_KEY is not configured")
+        if not cls.PRIVY_APP_ID:
+            errors.append("PRIVY_APP_ID is not configured")
+        if not cls.PRIVY_VERIFICATION_KEY:
+            errors.append("PRIVY_VERIFICATION_KEY is not configured")
         return errors

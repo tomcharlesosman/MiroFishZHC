@@ -125,6 +125,13 @@ LLM_MODEL_NAME=qwen-plus
 # Zep Cloud 配置
 # 每月免费额度即可支撑简单使用：https://app.getzep.com/
 ZEP_API_KEY=your_zep_api_key
+
+# Privy 登录配置
+PRIVY_APP_ID=your_privy_app_id
+VITE_PRIVY_APP_ID=your_privy_app_id
+VITE_PRIVY_CLIENT_ID=your_privy_client_id
+PRIVY_VERIFICATION_KEY="-----BEGIN PUBLIC KEY-----\nYOUR_PRIVY_PUBLIC_KEY\n-----END PUBLIC KEY-----"
+FRONTEND_ORIGIN=http://localhost:3000
 ```
 
 #### 2. 安装依赖

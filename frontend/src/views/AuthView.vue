@@ -52,65 +52,69 @@
           </div>
 
           <div class="panel-header">
-            <button
-              class="mode-toggle"
-              :class="{ active: mode === 'signin' }"
-              @click="switchMode('signin')"
-              type="button"
-            >
-              Sign in
-            </button>
-            <button
-              class="mode-toggle"
-              :class="{ active: mode === 'signup' }"
-              @click="switchMode('signup')"
-              type="button"
-            >
-              Sign up
-            </button>
+            <span class="panel-chip active">Email code</span>
+            <span class="panel-chip">Ethereum wallet</span>
           </div>
         </div>
 
-        <form class="auth-form" @submit.prevent="submit">
-          <label v-if="mode === 'signup'" class="field">
-            <span>Name</span>
-            <input
-              v-model.trim="form.name"
-              type="text"
-              placeholder="How your name should appear"
-              :disabled="submitting"
-            />
-          </label>
-
+        <form class="auth-form" @submit.prevent="verifyEmailCode">
           <label class="field">
             <span>Email</span>
             <input
               v-model.trim="form.email"
               type="email"
               placeholder="name@example.com"
-              :disabled="submitting"
+              :disabled="sendingCode || verifyingCode || connectingWallet"
             />
           </label>
 
-          <label class="field">
-            <span>Password</span>
+          <div class="action-row">
+            <button
+              class="secondary-btn"
+              type="button"
+              :disabled="sendingCode || verifyingCode || connectingWallet"
+              @click="requestEmailCode"
+            >
+              <span v-if="sendingCode">Sending...</span>
+              <span v-else>{{ codeSent ? 'Resend code' : 'Send code' }}</span>
+            </button>
+            <span class="helper-text">First-time sign-in creates the account and provisions an embedded wallet.</span>
+          </div>
+
+          <label v-if="codeSent" class="field">
+            <span>Verification code</span>
             <input
-              v-model="form.password"
-              type="password"
-              placeholder="At least 8 characters"
-              minlength="8"
-              :disabled="submitting"
+              v-model.trim="form.code"
+              type="text"
+              inputmode="numeric"
+              placeholder="Enter the code from your inbox"
+              :disabled="verifyingCode || connectingWallet"
             />
           </label>
 
           <p v-if="errorMessage" class="status error">{{ errorMessage }}</p>
           <p v-if="successMessage" class="status success">{{ successMessage }}</p>
+          <p v-if="authState.error" class="status error">{{ authState.error }}</p>
 
-          <button class="submit-btn" type="submit" :disabled="submitting">
-            <span v-if="submitting">Working...</span>
+          <button class="submit-btn" type="submit" :disabled="!codeSent || verifyingCode || connectingWallet">
+            <span v-if="verifyingCode">Verifying...</span>
             <span v-else>{{ submitLabel }}</span>
           </button>
         </form>
+
+        <div class="divider">
+          <span>or</span>
+        </div>
+
+        <button
+          class="wallet-btn"
+          type="button"
+          :disabled="sendingCode || verifyingCode || connectingWallet"
+          @click="connectWallet"
+        >
+          <span v-if="connectingWallet">Connecting wallet...</span>
+          <span v-else>{{ walletButtonLabel }}</span>
+        </button>
 
         <div class="panel-note">
           <span>Next</span>
@@ -122,23 +126,31 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import heroScene from '../assets/hero/juno-fish-original.jpg'
-import { authClient } from '../lib/auth-client'
+import {
+  getAuthState,
+  initializeAuth,
+  loginWithEmailCode,
+  loginWithEthereumWallet,
+  sendEmailCode
+} from '../lib/auth-client'
 
 const route = useRoute()
 const router = useRouter()
 
-const mode = ref('signin')
-const submitting = ref(false)
+const authState = getAuthState()
+const codeSent = ref(false)
+const sendingCode = ref(false)
+const verifyingCode = ref(false)
+const connectingWallet = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 const form = reactive({
-  name: '',
   email: '',
-  password: ''
+  code: ''
 })
 
 const redirectPath = computed(() => {
@@ -162,47 +174,45 @@ const authHeadline = computed(() => {
     return `Continue to ${destinationLabel.value}.`
   }
 
-  return mode.value === 'signin'
-    ? 'Sign in to start or reopen a project.'
-    : 'Create your JunoFish account.'
+  return 'Sign in with email or wallet.'
 })
 
 const authIntro = computed(() => {
   if (isReturningToFlow.value) {
-    return 'Your place is being held. Sign in or create an account and you will go straight back to where you were heading.'
+    return 'Your place is being held. Sign in with an email code or an Ethereum wallet and we will return you to the flow with a wallet-linked account.'
   }
 
-  return 'Use email and password to save projects, reopen earlier work, and move from the public landing page into the full app.'
+  return 'Use a one-time email code for a fast sign-in, or connect an Ethereum wallet. Every account is provisioned with a wallet for web3-ready access.'
 })
 
 const flowStepOne = computed(() => {
   return isReturningToFlow.value
-    ? 'Sign in with your email, or create an account if this is your first visit.'
-    : 'Create an account in a few seconds with email and password.'
+    ? 'Enter your email to receive a one-time code, or connect your Ethereum wallet.'
+    : 'Use your email for a passwordless sign-in flow.'
 })
 
 const flowStepTwo = computed(() => {
   return isReturningToFlow.value
     ? `We will send you straight back to ${destinationLabel.value}.`
-    : 'Your work and saved projects stay attached to your account.'
+    : 'A first-time login creates the account and attaches an embedded wallet.'
 })
 
 const flowStepThree = computed(() => {
   return isReturningToFlow.value
-    ? 'From there, you can continue the setup without starting over.'
-    : 'You can always browse first and sign in only when you need the full workspace.'
+    ? 'Wallet login stays available if you want to use an external wallet instead.'
+    : 'Wallet login gives you a second path while preserving an embedded wallet on the account.'
 })
 
 const panelHeadline = computed(() => {
-  return mode.value === 'signin' ? 'Enter JunoFish' : 'Create account'
+  return isReturningToFlow.value ? 'Confirm your access' : 'Enter JunoFish'
 })
 
 const submitLabel = computed(() => {
-  if (mode.value === 'signin') {
-    return isReturningToFlow.value ? 'Sign in and continue' : 'Sign in'
-  }
+  return isReturningToFlow.value ? 'Verify and continue' : 'Verify email and enter JunoFish'
+})
 
-  return isReturningToFlow.value ? 'Create account and continue' : 'Create account'
+const walletButtonLabel = computed(() => {
+  return isReturningToFlow.value ? 'Connect wallet and continue' : 'Use Ethereum wallet'
 })
 
 const nextStepCopy = computed(() => {
@@ -221,59 +231,68 @@ const resetStatus = () => {
   successMessage.value = ''
 }
 
-const switchMode = (nextMode) => {
-  mode.value = nextMode
-  resetStatus()
-}
-
-const submit = async () => {
+const requestEmailCode = async () => {
   resetStatus()
 
-  if (mode.value === 'signup' && !form.name) {
-    errorMessage.value = 'Please enter a display name.'
+  if (!form.email) {
+    errorMessage.value = 'Please enter an email address.'
     return
   }
 
-  if (!form.email || !form.password) {
-    errorMessage.value = 'Please enter both email and password.'
-    return
-  }
-
-  submitting.value = true
+  sendingCode.value = true
 
   try {
-    if (mode.value === 'signup') {
-      const signUpResult = await authClient.signUp.email({
-        name: form.name,
-        email: form.email,
-        password: form.password
-      })
-
-      if (signUpResult.error) {
-        errorMessage.value = signUpResult.error.message || 'Sign-up failed.'
-        return
-      }
-
-      successMessage.value = 'Account created. Signing you in...'
-    }
-
-    const signInResult = await authClient.signIn.email({
-      email: form.email,
-      password: form.password
-    })
-
-    if (signInResult.error) {
-      errorMessage.value = signInResult.error.message || 'Sign-in failed.'
-      return
-    }
-
-    await router.replace(getRedirectTarget())
+    await sendEmailCode(form.email)
+    codeSent.value = true
+    successMessage.value = 'Code sent. Check your inbox.'
   } catch (error) {
-    errorMessage.value = error?.message || 'Authentication request failed.'
+    errorMessage.value = error?.message || 'Failed to send the verification code.'
   } finally {
-    submitting.value = false
+    sendingCode.value = false
   }
 }
+
+const verifyEmailCode = async () => {
+  resetStatus()
+
+  if (!form.email || !form.code) {
+    errorMessage.value = 'Please enter both your email and the verification code.'
+    return
+  }
+
+  verifyingCode.value = true
+
+  try {
+    await loginWithEmailCode(form.email, form.code)
+    await router.replace(getRedirectTarget())
+  } catch (error) {
+    errorMessage.value = error?.message || 'Verification failed.'
+  } finally {
+    verifyingCode.value = false
+  }
+}
+
+const connectWallet = async () => {
+  resetStatus()
+  connectingWallet.value = true
+
+  try {
+    await loginWithEthereumWallet()
+    await router.replace(getRedirectTarget())
+  } catch (error) {
+    errorMessage.value = error?.message || 'Wallet login failed.'
+  } finally {
+    connectingWallet.value = false
+  }
+}
+
+onMounted(async () => {
+  try {
+    await initializeAuth()
+  } catch (error) {
+    errorMessage.value = error?.message || 'Privy failed to initialize.'
+  }
+})
 </script>
 
 <style scoped>
@@ -340,10 +359,13 @@ const submit = async () => {
 .brand-meta,
 .flow-row span,
 .panel-kicker,
-.mode-toggle,
+.panel-chip,
 .field span,
 .submit-btn,
-.panel-note span {
+.secondary-btn,
+.wallet-btn,
+.panel-note span,
+.helper-text {
   font-family: 'JetBrains Mono', monospace;
 }
 
@@ -383,7 +405,9 @@ const submit = async () => {
 }
 
 .back-home-btn:hover,
-.submit-btn:hover {
+.submit-btn:hover,
+.secondary-btn:hover,
+.wallet-btn:hover {
   transform: translateY(-2px);
 }
 
@@ -521,18 +545,18 @@ const submit = async () => {
   background: rgba(7, 16, 23, 0.05);
 }
 
-.mode-toggle {
-  border: 0;
+.panel-chip {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   padding: 14px 16px;
-  background: transparent;
-  color: rgba(7, 16, 23, 0.72);
   font-size: 0.78rem;
   letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: background 0.22s ease, color 0.22s ease;
+  color: rgba(7, 16, 23, 0.72);
+  background: rgba(255, 255, 255, 0.58);
 }
 
-.mode-toggle.active {
+.panel-chip.active {
   background: #111111;
   color: #ffffff;
 }
@@ -571,6 +595,36 @@ const submit = async () => {
   background: rgba(255, 255, 255, 0.96);
 }
 
+.action-row {
+  display: grid;
+  gap: 10px;
+}
+
+.secondary-btn,
+.wallet-btn {
+  border: 1px solid rgba(7, 16, 23, 0.12);
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--ink);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.22s ease, opacity 0.22s ease, background 0.22s ease;
+}
+
+.secondary-btn:disabled,
+.wallet-btn:disabled,
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.helper-text {
+  font-size: 0.68rem;
+  line-height: 1.6;
+  color: rgba(7, 16, 23, 0.56);
+}
+
 .status {
   font-size: 0.92rem;
   line-height: 1.55;
@@ -595,9 +649,24 @@ const submit = async () => {
   transition: transform 0.22s ease, opacity 0.22s ease;
 }
 
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: wait;
+.divider {
+  display: grid;
+  place-items: center;
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
+
+.divider span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 4px 10px;
+  border: 1px solid var(--paper-line);
+  color: rgba(7, 16, 23, 0.56);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .panel-note {
