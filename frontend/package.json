@@ -18,5 +18,8 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
     "vite": "^7.2.4"
+  },
+  "overrides": {
+    "ws@^8.0.0": "^8.21.0"
   }
 }
